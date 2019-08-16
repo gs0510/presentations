@@ -41,10 +41,16 @@
       <section>
         <h1><span class="hugify alright-calm-down-a-little" style="display: block; font-size: 83%">What even is a
             systems programming language?</span></h1>
+        <aside class="notes">
+          Before I begin talking about syscalls, I want to talk about what even is a systems programming language?
+          It's a term you hear a lot when talking about Rust! How Rust is a new systems programming language? What makes
+          a programming language suitable for systems programming? So, let's take a tour through history, and talk about
+          the evolution of systems programming languages!
+        </aside>
       </section>
       <section>
         <h2><em style="font-size: 237%">1970</em>s:<span class="hugify alright-calm-down-a-little">Improving on
-            Assembley</span>
+            Assembly</span>
         </h2>
         <aside class="notes">
         </aside>
@@ -61,6 +67,12 @@
           </div>
         </div>
         <aside class="notes">
+          I don’t know who coined the phrase originally, but my searches suggest that serious effort in defining
+          “computer systems” started around the early 70s.
+
+          In Systems Programming Languages (Bergeron1 et al. 1972), the authors say: "A system is an integrated set of
+          subprograms exceeding some threshold of size or complexity."
+
           Typical examples are systems for multiprogramming, translating, simulating, managing information, and time
           sharing.
 
@@ -86,8 +98,7 @@
           It is designed for continued “production” use rather than a one-shot solution to a single applications
           problem.
           A system program requires a certain discipline or structure, both within and between modules (i.e. ,
-          “communication”) ,
-          and is usually designed and implemented by more than one person.
+          “communication”) , and is usually designed and implemented by more than one person.
 
 
         </aside>
@@ -105,12 +116,10 @@
           while this definition is largely descriptive, a key idea in the paper is prescriptive: advocating for the
           separation of low-level languages from systems languages (at the time, contrasting assembly with FORTRAN).
 
-          Such a language should combine the conciseness and readability of high ,, languages with the space and time
+          Such a language should combine the conciseness and readability of high level languages with the space and time
           efficiency and the ability to “get at” machine and operating system facilities obtainable in assembler
           language. Designing, writing, and debugging time should be minimized without imposing unnecessary overhead
-          on
-          systems resources.
-
+          on systems resources.
         </aside>
       </section>
 
@@ -119,6 +128,9 @@
           <figcaption>Credit: Systems Programming (Donovan 1972)</figcaption>
         </figure>
         <aside class="notes">
+          The last entry to consider from 1970s is the paper "Systems Programming" from Donovan and folks.
+          1972 was a productive year ! -_-
+
           What is systems programming? You may visualize a computer as some sort of beast that obeys all commands. It
           has been said that computers are basically people made out of metal or, conversely, people are computers made
           out of flesh and blood. However, once we get close to computers, we see that they are basically machines that
@@ -128,8 +140,6 @@
           cannot understand such language without the aid of systems programs. Systems programs (e.g. compilers,
           loaders, macro processors, operating systems) were developed to make computers better adapted to the needs of
           their users. Further, people wanted more assistance in the mechanics of preparing their programs.
-
-
         </aside>
       </section>
 
@@ -139,14 +149,10 @@
             Scripting languages</span>
         </h2>
         <aside class="notes">
-          “Scripting: Higher Level Programming for the 21st Century” (Ousterhout 1998)
-          Scripting languages are designed for different tasks than system programming languages, and this leads to
-          fundamental differences in the languages. System programming languages were designed for building data
-          structures and algorithms from scratch, starting from the most primitive computer elements such as words of
-          memory. In contrast, scripting languages are designed for gluing: they assume the existence of a set of
-          powerful components and are intended primarily for connecting components together.
-          System programming languages are strongly typed to help manage complexity, while scripting languages are
-          typeless to simplify connections between components and provide rapid application development.
+          In the 70s and 80s, it seems like most researchers saw systems programming usually as a contrast to assembly
+          programming. There simply were no other good tools to build systems
+          However, in the mid 90s, a major sea change occurred in programming languages with the rise of
+          dynamically-typed scripting languages.
 
 
         </aside>
@@ -183,6 +189,11 @@
           massive engineering resources poured into JIT compilers for both static languages (e.g. Java’s HotSpot) and
           dynamic language (e.g. Lua’s LuaJIT, Javascript’s V8, Python’s PyPy) have made their performance competitive
           with traditional systems programming languages (C, C++).
+
+          ava (1995) and C# (2000) turned into the titans we know today. While these two aren’t traditionally
+          considered “systems programming languages,” they have been used to design many of the world’s biggest software
+          systems. Ousterhout even explicitly mentioned “in the Internet world that is taking shape now, Java is used
+          for system programming.”
         </aside>
       </section>
 
@@ -216,7 +227,7 @@
           programming languages is that when you identify an inefficiency, it is within your power to eliminate the
           bottleneck by careful control over machine details.
 
-          In the same way static types provide more confidence3 like “these two things I’m trying to add are definitely
+          In the same way static types provide more confidence like “these two things I’m trying to add are definitely
           integers,” low-level languages provide more confidence that “this code will execute on the machine as I
           specified.”
 
@@ -243,6 +254,11 @@
 
           </div>
         </div>
+        <aside class="notes">
+          But you can throw everything I talked about last 10 minutes out of the window and systems-programming is
+          when you spend more time looking at man pages than you do the internet.
+        </aside>
+
       </section>
 
 
@@ -252,23 +268,8 @@
 
         </h2>
         <aside class="notes">
-
-
-        </aside>
-      </section>
-
-      <section>
-        <h2> <span style="display: block; font-size: 140%">What is</span> <em style="font-size: 140%">strace?
-          </em>
-        </h2>
-        <ul>
-          <li class="fragment">A diagnostic, debugging and instructional userspace utility for Linux.</li>
-          <li class="fragment">Invaluable for solving problems with programs for which the source is not readily
-            available.</li>
-        </ul>
-        <aside class="notes">
-
-
+          This is the second part of the talk. In this part, we will learn how to write our own strace! Before
+          we begin talking about strace, let's talk about what are system calls?!
         </aside>
       </section>
 
@@ -276,6 +277,9 @@
         <figure><img src="./images/syscalls.png" alt="">
         </figure>
         <aside class="notes">
+          In computing, a system call is the programmatic way in which a computer program requests a service from the
+          kernel of the operating system it is executed on.
+
           A request from an application program for the operating system to perform some hardware action on behalf of
           the application. System calls are initiated with a software interrupt assembly language instruction. The
           argument to the interrupt instruction is a number, which corresponds to the index of an array in the OS kernel
@@ -332,6 +336,21 @@
       </section>
 
       <section>
+        <h2> <span style="display: block; font-size: 140%">What is</span> <em style="font-size: 140%">strace?
+          </em>
+        </h2>
+        <ul>
+          <li class="fragment">A diagnostic, debugging and instructional userspace utility for Linux.</li>
+          <li class="fragment">Invaluable for solving problems with programs for which the source is not readily
+            available.</li>
+        </ul>
+        <aside class="notes">
+
+
+        </aside>
+      </section>
+
+      <section>
         <h2 style="font-size: 204%">Writing our own strace.</h2>
         <ul>
           <li class="fragment">How to observe another process?</li>
@@ -339,9 +358,7 @@
           <li class="fragment">How to fetch register values?</li>
         </ul>
         <aside class="notes">
-          Some system calls are posix system calls, some are not.
-          POSIX is a family of standards specified by the IEEE Computer Society for maintaining compatibility between
-          operating systems.
+
 
         </aside>
       </section>
