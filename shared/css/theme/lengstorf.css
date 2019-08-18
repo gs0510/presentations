@@ -37,7 +37,7 @@ body {
 
 ::selection {
   color: #fff;
-  background: #e06900;
+  background:  #8040bf;
   text-shadow: none; }
 
 .reveal .slides > section,
@@ -71,6 +71,7 @@ body {
   font-size: 2.11em; }
 
 .reveal h3 {
+  line-height: 26pt;
   font-size: 1.55em; }
 
 .reveal h4 {
@@ -220,14 +221,14 @@ body {
  * LINKS
  *********************************************/
 .reveal a {
-  color: #e06900;
+  color:  #8040bf;
   text-decoration: none;
   -webkit-transition: color .15s ease;
   -moz-transition: color .15s ease;
   transition: color .15s ease; }
 
 .reveal a:hover {
-  color: #ff8214;
+  color:  #8040bf;
   text-shadow: none;
   border: none; }
 
@@ -255,7 +256,7 @@ body {
 
 .reveal a:hover img {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #e06900;
+  border-color:  #8040bf;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.55); }
 
 /*********************************************
@@ -263,31 +264,31 @@ body {
  *********************************************/
 .reveal .controls .navigate-left,
 .reveal .controls .navigate-left.enabled {
-  border-right-color: #e06900; }
+  border-right-color:  #8040bf; }
 
 .reveal .controls .navigate-right,
 .reveal .controls .navigate-right.enabled {
-  border-left-color: #e06900; }
+  border-left-color:  #8040bf; }
 
 .reveal .controls .navigate-up,
 .reveal .controls .navigate-up.enabled {
-  border-bottom-color: #e06900; }
+  border-bottom-color: #8040bf; }
 
 .reveal .controls .navigate-down,
 .reveal .controls .navigate-down.enabled {
-  border-top-color: #e06900; }
+  border-top-color: #8040bf; }
 
 .reveal .controls .navigate-left.enabled:hover {
-  border-right-color: #ff8214; }
+  border-right-color: #8040bf; }
 
 .reveal .controls .navigate-right.enabled:hover {
-  border-left-color: #ff8214; }
+  border-left-color: #8040bf; }
 
 .reveal .controls .navigate-up.enabled:hover {
-  border-bottom-color: #ff8214; }
+  border-bottom-color: #8040bf; }
 
 .reveal .controls .navigate-down.enabled:hover {
-  border-top-color: #ff8214; }
+  border-top-color: #8040bf; }
 
 /*********************************************
  * PROGRESS BAR
@@ -296,7 +297,7 @@ body {
   background: rgba(0, 0, 0, 0.2); }
 
 .reveal .progress span {
-  background: #e06900;
+  background: #8040bf;
   -webkit-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
   -moz-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
   transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }
@@ -345,7 +346,7 @@ html.blackout::after, html.dimmer::after {
     .reveal h4 strong,
     .reveal h5 strong,
     .reveal h6 strong {
-      color: #e06900;
+      color: #8040bf;
       font-weight: 800; }
     .reveal h1 em,
     .reveal h2 em,

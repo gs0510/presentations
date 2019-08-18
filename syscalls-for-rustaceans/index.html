@@ -38,6 +38,13 @@
         <h1 style="font-size: 80px; width: 110%; margin-left: -5%; margin-top: 80px;">Syscalls for Rustaceans!</h1>
         <p>by Gargi Sharma<br><small><a href="https://twitter.com/gawwrgi">@gawwrgi</a>&nbsp; &nbsp;</small></p>
       </section>
+
+      <section>
+        <h2>Follow the slides: <em style="font-size: 97%"><a href="http://tiny.cc/rustrace">tiny.cc/rustrace</a></em>
+        </h2>
+
+      </section>
+
       <section>
         <h1><span class="hugify alright-calm-down-a-little" style="display: block; font-size: 83%">What even is a
             systems programming language?</span></h1>
@@ -56,9 +63,11 @@
         </aside>
       </section>
       <section>
-        <h3> "A <em style="font-size: 137%">system program</em> is an integrated <em style="font-size: 137%">set of
-            subprograms</em> ...
-          <em style="font-size: 137%">exceeding</em> some threshold of <em style="font-size: 137%">size and/or
+        <h3> "A <em style="font-size: 137%">system program</em> is <span><br></span> an integrated <em
+            style="font-size: 137%">set of<span><br></span>
+            subprograms</em> ... <span><br></span>
+          <em style="font-size: 137%">exceeding</em> some <span><br></span> threshold of <em
+            style="font-size: 137%">size <span><br></span> and/or
             complexity.</em>"</h3>
         <div style="display: flex; justify-content: space-between;">
           <div style="width: 95%">
@@ -241,12 +250,37 @@
         </aside>
       </section>
 
+      <section>
+        <h2> <span style="display: block; font-size: 140%">Where does</span> <em style="font-size: 140%">Rust
+          </em><span style="display: block; font-size: 140%">shine?</span>
+        </h2>
+        <aside class="notes">
+          Its headline domain is systems programming, an area most prominently occupied by C & C++. Yet the boundary of
+          that domain is quite porous. Historically, it would have covered software such as operating systems,
+          compilers, interpreters, file systems and device drivers. Now, it would also include web browsers and other
+          software, even if it are user-facing.
+
+          Despite many advances in programming languages, clean-slate operating systems, hypervisors, key-value stores,
+          web servers, network and storage frameworks are still developed in C, a programming language that is in many
+          ways closer to assembly than to a modern high-level language. Today, the price of running unsafe code is high…
+          Why are we still using C?
+
+          We should also consider the additional benefits of consider additional benefits for systems programming that
+          are enabled by Rust’s type system: software fault isolation (SFI), program analysis – especially static
+          information flow control (IFC), and safe traversal of pointer-linked data structures which enables automation
+          of tasks such as checkpointing.
+        </aside>
+      </section>
 
 
       <section>
-        <h3 style="margin-bottom: 0; font-size: 180%">Systems programming is programming where you spend more time<span
-            style="display: block; margin-top: 0.05em; font-size: 120%"><em>reading man pages</em><span
-              style="font-size: 108%"> than</span>
+        <h3 style="margin-bottom: 0; font-size: 180%"><span>Systems programming is </span>
+          <span><br></span><span>programming
+            where</span> <span><br></span> <span>you spend
+            more time </span>
+          <span style="display: block; margin-top: 0.05em; font-size: 120%"><em>reading man
+              pages</em><span>
+              than</span>
             <em>reading the internet.</em></span></h3>
         <div style="display: flex; justify-content: space-between;">
           <div style="width: 95%">
@@ -276,29 +310,31 @@
       <section>
         <figure><img src="./images/syscalls.png" alt="">
         </figure>
+        <h2> <span class="fragment"> <em style="font-size: 140%">System Calls!
+            </em></span>
+        </h2>
         <aside class="notes">
-          In computing, a system call is the programmatic way in which a computer program requests a service from the
-          kernel of the operating system it is executed on.
-
-          A request from an application program for the operating system to perform some hardware action on behalf of
-          the application. System calls are initiated with a software interrupt assembly language instruction. The
-          argument to the interrupt instruction is a number, which corresponds to the index of an array in the OS kernel
-          with pointers to the functions that provide the requested service.
+          When you are running an application, and you want to do something that might seem trivial,
+          for example, reading from a file, you still need to talk to the operating system, because
         </aside>
       </section>
 
       <section>
-        <h2 style="font-size: 204%">Syscalls!</h2>
-        <h4><span class="fragment">Around 330 system calls in Linux:</span><br><em class="fragment">Some very esoteric
-          </em><span class="fragment">+ <em>Some very widespread</em></span></h4>
+        <h2> <em style="font-size: 140%">Syscalls!</em></h2>
+        <h4><span class="fragment">Around 330 system calls in Linux:</h4>
         <ul>
-          <li class="fragment">File Access - read, write, open, close, stat, etc.</li>
-          <li class="fragment">Process Control - wait, waitpid, kill, etc.</li>
-          <li class="fragment">Network Access - socket, getsockpt, listen, etc.</li>
+          <li class="fragment">File Access - <font color="#800020">read</font>, <font color="#800020">write</font>,
+            <font color="#800020">open</font>, <font color="#800020">close</font>, etc.</li>
+          <li class="fragment">Process Control - <font color="#800020">wait</font>, <font color="#800020">waitpid</font>
+            , <font color="#800020">kill</font>, etc.</li>
+          <li class="fragment">Network Access - <font color="#800020">socket</font>, <font color="#800020">getsockpt
+            </font>, <font color="#800020">listen</font>, etc.</li>
         </ul>
         <aside class="notes">
+          Some esoteric, some widespread.
           Some system calls are posix system calls, some are not.
-          POSIX is a family of standards specified by the IEEE Computer Society for maintaining compatibility between
+          POSIX is a family of standards specified by the IEEE Computer Society for maintaining compatibility
+          between
           operating systems.
 
         </aside>
@@ -365,7 +401,9 @@
 
       <section>
         <h2>How to observe a process?</h2>
-        <h4><em class="fragment">ptrace!!</em></h4>
+        <h4><em class="fragment">
+            <font color="#800020">ptrace!!</font>
+          </em></h4>
         <em class="fragment">
           <figure><img src="./images/ptrace.png" alt=""></figure>
         </em>
@@ -428,6 +466,11 @@
       </section>
 
       <section>
+        <h2>You can find the code on Github: <a href="https://github.com/gs0510/rustrace">rustrace</a> </h2>
+
+      </section>
+
+      <section>
         <h2><strong class="hugify">DEMO!</strong></h2>
       </section>
 
@@ -452,6 +495,11 @@
       </section>
     </div>
   </div>
+
+  <div class="hashtag">
+    <p>Tweet: <a href="https://twitter.com/gawwrgi">@gawwrgi </a></p>
+  </div>
+
   <script src="lib/js/head.min.js">
   </script>
   <script src="js/reveal.js"></script>
