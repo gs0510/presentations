@@ -42,6 +42,9 @@
       <section>
         <h2>Follow the slides: <em style="font-size: 97%"><a href="http://tiny.cc/rustrace">tiny.cc/rustrace</a></em>
         </h2>
+        <aside class="notes">
+          You can follow along with the slides at the link: tiny.cc/rustrace
+        </aside>
 
       </section>
 
@@ -50,9 +53,18 @@
             systems programming language?</span></h1>
         <aside class="notes">
           Before I begin talking about syscalls, I want to talk about what even is a systems programming language?
-          It's a term you hear a lot when talking about Rust! How Rust is a new systems programming language? What makes
-          a programming language suitable for systems programming? So, let's take a tour through history, and talk about
-          the evolution of systems programming languages!
+          It's a term you hear a lot when talking about Rust! How Rust is a new systems programming language? But what
+          makes a programming language suitable for systems programming?
+
+          What makes C, C++, Rust good candidates for systems programming and Python, Perl not so good candidates?
+          I want us to take a tour through history, and talk about the evolution of systems programming languages!
+
+          I will focus on these themes:
+          1. What does it mean to be a systems programming language?
+          2. What makes Rust a good candidate for systems programming language?
+          3. Learn about system calls, and getting started with writing your first
+          systems program in Rust!
+
         </aside>
       </section>
       <section>
@@ -93,17 +105,22 @@
         </h2>
         <ul>
           <li class="fragment">The system program is likely to be used to support other software programs.</li>
+          <br>
           <li class="fragment">It is designed for continued “production” use rather than a one-shot solution to a single
             applications problem.</li>
-          <li class="fragment">A system program requires a certain discipline or structure, both within and between
-            modules.</li>
         </ul>
         <aside class="notes">
+          The paper then goes on to define what a "systems program" looks like!
           The system program is likely to be used to support other software and applications programs, but may also be a
           complete applications package itself.
-          It is likely to be continuously evolving in the number and types of features it supports.
-          A system program requires a certain discipline, both within and between modules, and is usually designed and
-          implemented by more than one person.
+          for example, most application programs read from and write to files on disk. The operating system, written in
+          a systems programming language like C provides this functionality. It makes sure programs have the permissions
+          to access the files, handles multiple programs accessing the same file, loads blocks of files into memory and
+          so on.
+
+          It is likely to be continuously evolving in the number and types of
+          features it supports. A system program requires a certain discipline, both within and between modules, and is
+          usually designed and implemented by more than one person.
           It is designed for continued “production” use rather than a one-shot solution to a single applications
           problem.
           A system program requires a certain discipline or structure, both within and between modules (i.e. ,
@@ -138,7 +155,7 @@
         </figure>
         <aside class="notes">
           The last entry to consider from 1970s is the paper "Systems Programming" from Donovan and folks.
-          1972 was a productive year ! -_-
+          1972 was a productive year! 😎
 
           What is systems programming? You may visualize a computer as some sort of beast that obeys all commands. It
           has been said that computers are basically people made out of metal or, conversely, people are computers made
@@ -154,16 +171,13 @@
 
       <section>
         <h2><em style="font-size: 237%">1990</em><span>s:</span><span class="hugify alright-calm-down-a-little">Rise
-            of
-            Scripting languages</span>
+            of Scripting languages</span>
         </h2>
         <aside class="notes">
           In the 70s and 80s, it seems like most researchers saw systems programming usually as a contrast to assembly
           programming. There simply were no other good tools to build systems
           However, in the mid 90s, a major sea change occurred in programming languages with the rise of
           dynamically-typed scripting languages.
-
-
         </aside>
       </section>
 
@@ -185,6 +199,10 @@
           powerful components and are intended primarily for connecting components together.
           System programming languages are strongly typed to help manage complexity, while scripting languages are
           typeless to simplify connections between components and provide rapid application development.
+
+          On a technical level, Ousterhout contrasted scripting vs. systems along the axes of type-safety and
+          instructions-per-statement, as shown above. On a design level, he characterized the new roles for each
+          language class: systems programming is for creating components, and scripting is for gluing them together.
         </aside>
       </section>
 
@@ -195,7 +213,7 @@
             Blur</span>
         </h2>
         <aside class=" notes">
-          massive engineering resources poured into JIT compilers for both static languages (e.g. Java’s HotSpot) and
+          Massive engineering resources poured into JIT compilers for both static languages (e.g. Java’s HotSpot) and
           dynamic language (e.g. Lua’s LuaJIT, Javascript’s V8, Python’s PyPy) have made their performance competitive
           with traditional systems programming languages (C, C++).
 
@@ -243,10 +261,9 @@
           Low-level programmers should seek to understand what ideas in systems design could be adapted to deal with the
           reality of modern hardware.
 
-          Rust community has been exceedingly innovative in this respect, looking at how good software design/functional
-          programming principles can be applied to low-level problems (e.g. futures, error handling, or of course memory
-          safety).
-
+          Historically, system programs would have covered software such as operating systems,
+          compilers, interpreters, file systems and device drivers. Now, it would also include web browsers and other
+          software, even if it are user-facing.
         </aside>
       </section>
 
@@ -255,15 +272,9 @@
           </em><span style="display: block; font-size: 140%">shine?</span>
         </h2>
         <aside class="notes">
-          Its headline domain is systems programming, an area most prominently occupied by C & C++. Yet the boundary of
-          that domain is quite porous. Historically, it would have covered software such as operating systems,
-          compilers, interpreters, file systems and device drivers. Now, it would also include web browsers and other
-          software, even if it are user-facing.
-
-          Despite many advances in programming languages, clean-slate operating systems, hypervisors, key-value stores,
-          web servers, network and storage frameworks are still developed in C, a programming language that is in many
-          ways closer to assembly than to a modern high-level language. Today, the price of running unsafe code is high…
-          Why are we still using C?
+          Rust community has been exceedingly innovative in this respect, looking at how good software design/functional
+          programming principles can be applied to low-level problems (e.g. futures, error handling, or of course memory
+          safety).
 
           We should also consider the additional benefits of consider additional benefits for systems programming that
           are enabled by Rust’s type system: software fault isolation (SFI), program analysis – especially static
@@ -272,11 +283,9 @@
         </aside>
       </section>
 
-
       <section>
         <h3 style="margin-bottom: 0; font-size: 180%"><span>Systems programming is </span>
-          <span><br></span><span>programming
-            where</span> <span><br></span> <span>you spend
+          <span><br></span><span>programming where</span> <span><br></span> <span>you spend
             more time </span>
           <span style="display: block; margin-top: 0.05em; font-size: 120%"><em>reading man
               pages</em><span>
@@ -289,7 +298,7 @@
           </div>
         </div>
         <aside class="notes">
-          But you can throw everything I talked about last 10 minutes out of the window and systems-programming is
+          But you can throw everything I talked about last few minutes out of the window and systems-programming is
           when you spend more time looking at man pages than you do the internet.
         </aside>
 
@@ -302,8 +311,9 @@
 
         </h2>
         <aside class="notes">
-          This is the second part of the talk. In this part, we will learn how to write our own strace! Before
-          we begin talking about strace, let's talk about what are system calls?!
+          In the second part of this talk, I want to demystify writing system programs and empower you to write your
+          own! I hope that by the end of this talk you know what syscalls are and can write your own strace, or even
+          more complicated systems programs if you wish to!
         </aside>
       </section>
 
@@ -315,7 +325,14 @@
         </h2>
         <aside class="notes">
           When you are running an application, and you want to do something that might seem trivial,
-          for example, reading from a file, you still need to talk to the operating system, because
+          for example, reading from a file, but your user program doesn't have the necessary priviliges.
+
+          The operating system holds all the information about the file you want to read, for example the file
+          descriptor, where in memory the file is stored, etc. and you need to
+          talk to the operating system from your user program. Who you gonna call? System calls!
+
+          You can think of system calls as the API provided by the operating system. They are the interface between your
+          user program and the operating system.
         </aside>
       </section>
 
@@ -323,40 +340,79 @@
         <h2> <em style="font-size: 140%">Syscalls!</em></h2>
         <h4><span class="fragment">Around 330 system calls in Linux:</h4>
         <ul>
-          <li class="fragment">File Access - <font color="#800020">read</font>, <font color="#800020">write</font>,
+          <li class="fragment">File Access - <font color="#800020">creat</font>, <font color="#800020">read</font>,
+            <font color="#800020">write</font>,
             <font color="#800020">open</font>, <font color="#800020">close</font>, etc.</li>
           <li class="fragment">Process Control - <font color="#800020">wait</font>, <font color="#800020">waitpid</font>
-            , <font color="#800020">kill</font>, etc.</li>
+            , <font color="#800020">kill</font>, <font color="#800020">fork</font>, etc.</li>
           <li class="fragment">Network Access - <font color="#800020">socket</font>, <font color="#800020">getsockpt
             </font>, <font color="#800020">listen</font>, etc.</li>
         </ul>
         <aside class="notes">
-          Some esoteric, some widespread.
-          Some system calls are posix system calls, some are not.
-          POSIX is a family of standards specified by the IEEE Computer Society for maintaining compatibility
-          between
-          operating systems.
+          Linux has around 330 system calls, some of the system calls are very esoteric while some are very widespread.
 
+          Some of the common system calls that you might have heard for which are used for file access are creat - to
+          create a file, read, write, open, close.
+          I included creat, because when he was asked is there anything he regrets about Unix, he said he wished he
+          hadn't name the syscall creat. Also to note that creat is obsolete now because of open. 😁
+          For process control, some of the common system calls are wait/waitpid - when you want to wait for a process to
+          finish, kill - to kill a process, fork - to spawn a process.
+          For network access some of the common system calls are socket - to create a socket, getsockopt, listen - to
+          listen to the socket.
         </aside>
       </section>
 
       <section>
         <h2 style="font-size: 99%">What happens when a syscall occurs?</h2>
-        <figure><img src="./images/syscalls-actions.png" alt="">
+        <figure><img class="fragment" src="./images/syscalls-actions1.png" alt="">
+        </figure>
+        <figure><img class="fragment" src="./images/syscalls-actions2.png" alt="">
         </figure>
         <aside class="notes">
-          A request from an application program for the operating system to perform some hardware action on behalf of
-          the application. System calls are initiated with a software interrupt assembly language instruction. The
-          argument to the interrupt instruction is a number, which corresponds to the index of an array in the OS kernel
+          It's a simple 10 step process. When you want to read a file from user space, you setup one register with
+          file descriptor, one with the buffer where you want things to be read, and nbytes which will store how many
+          bytes have been written. Once these registers have been setup the control shifts to the library procedure.
+          The library procedure initiates syscalls with a software interrupt assembly language instruction.
+
+          Each syscall has an integer associated with it. For example read is 0, open is 2.
+          The argument to the interrupt is a number, which corresponds to the index of an array in the OS kernel
           with pointers to the functions that provide the requested service.
+          The kernel lookups the register with the file descriptor, puts the result back in the buffer register and the
+          number of bytes read in another register and the control switches back to the user space.
+
+          One thing to also note is that system calls are expensive! There are two context switches involved, one when
+          the control switches to the kernel and the second when the control switches back to the user space.
         </aside>
       </section>
 
+      <section>
+        <h2 style="font-size: 99%">What happens when a syscall occurs?</h2>
+        <figure><img class="fragment" src="./images/syscalls-actions3.png" alt="">
+        </figure>
+        <figure><img class="fragment" src="./images/syscalls-actions4.png" alt="">
+        </figure>
+        <figure><img class="fragment" src="./images/syscalls-actions5.png" alt="">
+        </figure>
+        <aside class="notes">
+          It's a simple 10 step process. When you want to read a file from user space, you setup one register with
+          file descriptor, one with the buffer where you want things to be read, and nbytes which will store how many
+          bytes have been written. Once these registers have been setup the control shifts to the library procedure.
+          The library procedure initiates syscalls with a software interrupt assembly language instruction.
 
+          Each syscall has an integer associated with it. For example read is 0, open is 2.
+          The argument to the interrupt is a number, which corresponds to the index of an array in the OS kernel
+          with pointers to the functions that provide the requested service.
+          The kernel lookups the register with the file descriptor, puts the result back in the buffer register and the
+          number of bytes read in another register and the control switches back to the user space.
+
+          One thing to also note is that system calls are expensive! There are two context switches involved, one when
+          the control switches to the kernel and the second when the control switches back to the user space.
+        </aside>
+      </section>
 
       <section>
         <h2 style="font-size: 204%">Making a syscall.</h2>
-        <figure><img src="./images/syscalls-registers.png" alt="">
+        <figure><img src="./images/syscall-registers.png" alt="">
         </figure>
         <ul>
           <li class="fragment">Setup register with syscall number & parameters.</li>
@@ -364,10 +420,13 @@
           <li class="fragment">Result stored in register.</li>
         </ul>
         <aside class="notes">
-          Some system calls are posix system calls, some are not.
-          POSIX is a family of standards specified by the IEEE Computer Society for maintaining compatibility between
-          operating systems.
-
+          The good thing is we don't have to actually setup these registers, there's a library which does that for us!
+          libc is the “C Standard Library” and has lots of historic connections with UNIX operating systems. The C
+          language was developed to write UNIX. Even today, interacting with a UNIX derivative involves using the tools
+          provided by the C language.
+          There are two mental hurdles required for Rust programmers to understanding this code:
+          1. the arcane types provided by libc
+          2. the unfamiliarity of providing arguments as pointers
         </aside>
       </section>
 
@@ -381,9 +440,18 @@
             available.</li>
         </ul>
         <aside class="notes">
-
-
+          strace is a linux utility which is incredibly useful for debugging closed source programs, or even finding out
+          performance bottlenecks! We know that syscalls are expensive, so when you find out that your program is doing
+          more open operations than you think it was, you can optimise that. Or when you have a closed source program
+          that was supposed to open the file x, but it opened the file y instead, strace allows you to do that! It's a
+          super power! 😅
         </aside>
+      </section>
+
+      <section>
+        <h2> strace example goes here.
+        </h2>
+
       </section>
 
       <section>
@@ -394,8 +462,14 @@
           <li class="fragment">How to fetch register values?</li>
         </ul>
         <aside class="notes">
+          So if we want to write our own strace, how do we go about it? First, we need to know how to observe another
+          process. If we think of it like a debugger, we'd want to attach our strace to a process.
 
+          Once we know how to "observe" or attach to a process, we have to figure out all the system calls that this
+          process we are attached to is making!
 
+          Once we figure out when the syscalls are being made, we'd have to figure out how to fetch the register values
+          to figure out what syscall is being made.
         </aside>
       </section>
 
@@ -409,10 +483,10 @@
         </em>
         <aside class="notes">
           The ptrace mechanism makes it possible for strace to interrupt the traced process every time a system call is
-          invoked, capture the call, decode it, and then resume the execution of the traced process. The challenge is
-          that, as you may know, every time a system call is invoked (eg. open, read, write, close), a transition from
-          user level to kernel level is required – this is known as a context switch. This is accomplished in different
-          ways depending on the CPU family and model, but it tends to be complex and relatively slow.
+          invoked, capture the call, decode it, and then resume the execution of the traced process.
+
+          The challenge is that every time a system call is invoked (eg. open, read, write, close), a context switch
+          from user level to kernel level is required. This process tends to be usually complex and relatively slow.
         </aside>
       </section>
 
@@ -424,6 +498,10 @@
         let mut child = cmd.spawn();
         </code></pre>
         <aside class="notes">
+          ptrace allows to the tracer to observe and even control the execution of the tracee. ptrace is pretty shady
+          but also very powerful! It's also a security risk, so if we want to trace a process, one we need to be in the
+          parent namespace of the process and second the tracee needs to give explicit permission to allowing itself to
+          be traced.
         </aside>
       </section>
 
@@ -434,20 +512,29 @@
           <figure><img src="./images/sigtrap.png" alt=""></figure>
         </em>
         <aside class="notes">
+          Everytime a syscall occurs in the traced process, a sigtrap is sent to ptrace and if you have a wait on the
+          process, the execution will stop and you can examine or even modify the registers!
         </aside>
       </section>
 
       <section>
         <h2>How to trap a system call?</h2>
         <pre><code>
-                    ptrace(
-                      Request::PTRACE_SYSCALL,
-                      pid,
-                      ptr::null_mut(),
-                      ptr::null_mut(),
-                    );
-                    </code></pre>
+        ptrace(
+          Request::PTRACE_SYSCALL,
+          pid,
+          ptr::null_mut(),
+          ptr::null_mut(),
+        );
+
+        waitpid(pid, None);
+        </code></pre>
         <aside class="notes">
+          Ptrace comes to rescue again! It has a flag called PTRACE_SYSCALL which will arrange for the tracee to be
+          stopped at the next entry to or exit from a system call, or after execution of a single instruction,
+          respectively. From the tracer's perspective, the tracee will appear to have been stopped by receipt of a SIG‐
+          TRAP. So, for PTRACE_SYSCALL, for example, the idea is to inspect the arguments to the system call at the
+          first stop, then do another PTRACE_SYSCALL and inspect the return value of the system call at the second stop.
         </aside>
       </section>
 
@@ -462,21 +549,65 @@
         );
         </code></pre>
         <aside class="notes">
+          So this call will fetch all the registers for us! We need to know which register stores the number of the
+          syscall. I found this out from googling, that this is stored in the orig_rax register!
+        </aside>
+      </section>
+
+      <section>
+        <h2><strong class="hugify">DEMO!</strong></h2>
+        <aside class="notes">
+        </aside>
+      </section>
+
+      <section>
+        <h2><strong class="hugify alright-calm-down-a-little">Conclusion</strong></h2>
+        <aside class="notes">
+          In conclusion, Rust is so much more empowering than C, or C++ for systems programming because it follows the
+          adage if it compiles, it works. In systems programming, sometimes you must perform operations that
+          cannot be statically verified as safe. Rust gives you the tools to wrap these operations in safe
+          abstractions, meaning that what was once relegated to code comments or convention can be statically enforced
+          by the Rust compiler. If you were to do the same in C/C++, there would be so many times you would
+          have to take care of memory allocation, and freeing this memory and other nitty-gritties that come with
+          working with C/C++ which means it not accessible and is intimidating for a lot of people. Empowering people to
+          write programs that they otherwise would have not written is superpower that Rust has!
+          Lastly, I would like to give a reminder that a lot of systems things aren't really that hard if explained in
+          a way that makes sense.
+          I think computer networking is a really good example of this -- a lot of people get really intimidated by
+          networking, but a lot of the core concepts like IP addresses and ports and packets are not really that hard,
+          and once you understand them you can learn a lot.
         </aside>
       </section>
 
       <section>
         <h2>You can find the code on Github: <a href="https://github.com/gs0510/rustrace">rustrace</a> </h2>
+      </section>
+
+      <section class="u--align-left resourcetext">
+        <h2><em style="font-size: 140%">A Shoutout!</em></h2>
+        <ol>
+          <li>Arshia Mufti</li>
+          <li>Shalom Abete</li>
+          <li>Hailey James-Sorenson</li>
+          <li>Taylor James-Sorenson</li>
+          <li>Carrie Wu</li>
+          <li>Andrew Zuckerman</li>
+          <li>Theo Constantinedes</li>
+          <li>Charilaos Pipis</li>
+          <li>Wassim Marrakchi</li>
+          <li>Stephen Koo</li>
+        </ol>
+
+        <aside class="notes">
+          I want to thank all these folks for their invaluable feedback! =)
+        </aside>
 
       </section>
 
       <section>
-        <h2><strong class="hugify">DEMO!</strong></h2>
+        <h2><em style="font-size: 140%">Thank you!</em></h2>
       </section>
 
-      <section>
-        <h1 class="no-margin">Thanks!</h1>
-      </section>
       <section class="u--align-left resourcetext">
         <h4>Resources</h4>
         <ol>
