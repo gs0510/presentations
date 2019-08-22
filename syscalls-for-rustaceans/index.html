@@ -276,10 +276,9 @@
           programming principles can be applied to low-level problems (e.g. futures, error handling, or of course memory
           safety).
 
-          We should also consider the additional benefits of consider additional benefits for systems programming that
-          are enabled by Rust’s type system: software fault isolation (SFI), program analysis – especially static
-          information flow control (IFC), and safe traversal of pointer-linked data structures which enables automation
-          of tasks such as checkpointing.
+          We should also consider the additional benefits for systems programming that are enabled by Rust’s type
+          system: software fault isolation (SFI), program analysis – especially static information flow control (IFC),
+          and safe traversal of pointer-linked data structures which enables automation of tasks such as checkpointing.
         </aside>
       </section>
 
@@ -353,8 +352,8 @@
 
           Some of the common system calls that you might have heard for which are used for file access are creat - to
           create a file, read, write, open, close.
-          I included creat, because when he was asked is there anything he regrets about Unix, he said he wished he
-          hadn't name the syscall creat. Also to note that creat is obsolete now because of open. 😁
+          I included creat, because when Ken Thompson was asked is there anything he regrets about Unix, he said he
+          wished syscall creat wasn't named as such. Also to note that creat is obsolete now because of open. 😁
           For process control, some of the common system calls are wait/waitpid - when you want to wait for a process to
           finish, kill - to kill a process, fork - to spawn a process.
           For network access some of the common system calls are socket - to create a socket, getsockopt, listen - to
@@ -449,9 +448,29 @@
       </section>
 
       <section>
-        <h2> strace example goes here.
+        <h2> <span style="display: block; font-size: 140%">What is</span> <em style="font-size: 140%">strace?
+          </em>
         </h2>
+        <pre><code>
+        fn main() {
+          println!("Hello RustConf!");
+        }
+        </code></pre>
+        <aside class="notes">
+        </aside>
+      </section>
 
+      <section>
+        <h2> What is <em style="font-size: 100%">strace?
+          </em>
+        </h2>
+        <figure><img src="./images/strace.png" alt="">
+        </figure>
+      </section>
+
+      <section>
+        <figure><img src="./images/stracec.png" alt="">
+        </figure>
       </section>
 
       <section>
@@ -561,7 +580,7 @@
       </section>
 
       <section>
-        <h2><strong class="hugify alright-calm-down-a-little">Conclusion</strong></h2>
+        <h2><strong class="hugify alright-calm-down-a-little" style="font-size: 104%">Conclusion 😊</strong></h2>
         <aside class="notes">
           In conclusion, Rust is so much more empowering than C, or C++ for systems programming because it follows the
           adage if it compiles, it works. In systems programming, sometimes you must perform operations that
