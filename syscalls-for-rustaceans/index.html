@@ -72,6 +72,8 @@
             Assembly</span>
         </h2>
         <aside class="notes">
+          I don’t know who coined the phrase originally, but my searches suggest that serious effort in defining
+          “computer systems” started around the early 70s.
         </aside>
       </section>
       <section>
@@ -88,9 +90,6 @@
           </div>
         </div>
         <aside class="notes">
-          I don’t know who coined the phrase originally, but my searches suggest that serious effort in defining
-          “computer systems” started around the early 70s.
-
           In Systems Programming Languages (Bergeron1 et al. 1972), the authors say: "A system is an integrated set of
           subprograms exceeding some threshold of size or complexity."
 
@@ -119,13 +118,10 @@
           so on.
 
           It is likely to be continuously evolving in the number and types of
-          features it supports. A system program requires a certain discipline, both within and between modules, and is
-          usually designed and implemented by more than one person.
-          It is designed for continued “production” use rather than a one-shot solution to a single applications
-          problem.
-          A system program requires a certain discipline or structure, both within and between modules (i.e. ,
-          “communication”) , and is usually designed and implemented by more than one person.
-
+          features it supports.
+          This definition is fairly agreeable—computer systems are large-scale, long-used, and time-varying. However,
+          while this definition is largely descriptive, a key idea in the paper is prescriptive: advocating for the
+          separation of low-level languages from systems languages (at the time, contrasting assembly with FORTRAN).
 
         </aside>
       </section>
@@ -138,10 +134,6 @@
         </h2>
 
         <aside class="notes">
-          This definition is fairly agreeable—computer systems are large-scale, long-used, and time-varying. However,
-          while this definition is largely descriptive, a key idea in the paper is prescriptive: advocating for the
-          separation of low-level languages from systems languages (at the time, contrasting assembly with FORTRAN).
-
           Such a language should combine the conciseness and readability of high level languages with the space and time
           efficiency and the ability to “get at” machine and operating system facilities obtainable in assembler
           language. Designing, writing, and debugging time should be minimized without imposing unnecessary overhead
@@ -201,7 +193,7 @@
           typeless to simplify connections between components and provide rapid application development.
 
           On a technical level, Ousterhout contrasted scripting vs. systems along the axes of type-safety and
-          instructions-per-statement, as shown above. On a design level, he characterized the new roles for each
+          instructions-per-statement. On a design level, he characterized the new roles for each
           language class: systems programming is for creating components, and scripting is for gluing them together.
         </aside>
       </section>
@@ -229,7 +221,7 @@
         <h2><em style="font-size: 237%">2010</em>s:</h2>
         <h2><span style="display: block; font-size: 70%">Boundaries Blur</span></h2>
         <ul>
-          <li class="fragment">Dropbox were able to build surprisingly large and scalable systems on just Python.</li>
+          <li class="fragment">Dropbox was able to build surprisingly large and scalable systems on just Python.</li>
           <li class="fragment">Javascript is used to render real-time, complex UIs in billions of web pages.</li>
           <li class="fragment">Gradual typing has gained steam in Javascript, Python, etc. enabling a transition from
             “prototype” code to “production” code.</li>
@@ -260,10 +252,6 @@
 
           Low-level programmers should seek to understand what ideas in systems design could be adapted to deal with the
           reality of modern hardware.
-
-          Historically, system programs would have covered software such as operating systems,
-          compilers, interpreters, file systems and device drivers. Now, it would also include web browsers and other
-          software, even if it are user-facing.
         </aside>
       </section>
 
@@ -278,7 +266,7 @@
 
           We should also consider the additional benefits for systems programming that are enabled by Rust’s type
           system: software fault isolation (SFI), program analysis – especially static information flow control (IFC),
-          and safe traversal of pointer-linked data structures which enables automation of tasks such as checkpointing.
+          and safe traversal of pointer-linked data structures.
         </aside>
       </section>
 
@@ -319,6 +307,7 @@
       <section>
         <figure><img src="./images/syscalls.png" alt="">
         </figure>
+        <br>
         <h2> <span class="fragment"> <em style="font-size: 140%">System Calls!
             </em></span>
         </h2>
@@ -344,7 +333,7 @@
             <font color="#800020">open</font>, <font color="#800020">close</font>, etc.</li>
           <li class="fragment">Process Control - <font color="#800020">wait</font>, <font color="#800020">waitpid</font>
             , <font color="#800020">kill</font>, <font color="#800020">fork</font>, etc.</li>
-          <li class="fragment">Network Access - <font color="#800020">socket</font>, <font color="#800020">getsockpt
+          <li class="fragment">Network Access - <font color="#800020">socket</font>, <font color="#800020">getsockopt
             </font>, <font color="#800020">listen</font>, etc.</li>
         </ul>
         <aside class="notes">
@@ -376,11 +365,7 @@
           Each syscall has an integer associated with it. For example read is 0, open is 2.
           The argument to the interrupt is a number, which corresponds to the index of an array in the OS kernel
           with pointers to the functions that provide the requested service.
-          The kernel lookups the register with the file descriptor, puts the result back in the buffer register and the
-          number of bytes read in another register and the control switches back to the user space.
 
-          One thing to also note is that system calls are expensive! There are two context switches involved, one when
-          the control switches to the kernel and the second when the control switches back to the user space.
         </aside>
       </section>
 
@@ -393,14 +378,6 @@
         <figure><img class="fragment" src="./images/syscalls-actions5.png" alt="">
         </figure>
         <aside class="notes">
-          It's a simple 10 step process. When you want to read a file from user space, you setup one register with
-          file descriptor, one with the buffer where you want things to be read, and nbytes which will store how many
-          bytes have been written. Once these registers have been setup the control shifts to the library procedure.
-          The library procedure initiates syscalls with a software interrupt assembly language instruction.
-
-          Each syscall has an integer associated with it. For example read is 0, open is 2.
-          The argument to the interrupt is a number, which corresponds to the index of an array in the OS kernel
-          with pointers to the functions that provide the requested service.
           The kernel lookups the register with the file descriptor, puts the result back in the buffer register and the
           number of bytes read in another register and the control switches back to the user space.
 
