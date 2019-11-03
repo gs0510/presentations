@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Syscalls for Rustaceans!</title>
+  <title>Containers for fun and no profit!</title>
   <meta name="description" content="Systems programming in Rust!">
   <link rel="stylesheet" href="css/reveal.css">
   <link id="theme" rel="stylesheet" href="css/theme/lengstorf.css">
@@ -35,7 +35,7 @@
   <div class="reveal">
     <div class="slides">
       <section>
-        <h1 style="font-size: 80px; width: 110%; margin-left: -5%; margin-top: 80px;">Syscalls for Rustaceans!</h1>
+        <h1 style="font-size: 120px; width: 110%; margin-left: -5%; margin-top: 80px;"><em>Containers</em> for fun and no profit!</h1>
         <p>by Gargi Sharma<br><small><a href="https://github.com/gs0510">github.com/gs0510</a>&nbsp; &nbsp;</small></p>
       </section>
 
@@ -307,11 +307,12 @@
       </section>
 
       <section>
-        <h2> <span class="fragment"> <em style="font-size: 140%">Containers are processes born from tarballs 
-			anchored to namespaces controlled by cgroups.
-            </em></span>
+        <h2>  Containers are <em>processes</em> <span class="fragment"> born from <em>tarballs</em> 
+			</span> <span class="fragment"> anchored to<em> namespaces</em> </span><span class="fragment"> controlled by <em>cgroups</em>.</span>
+            </em>
         </h2>
         <aside class="notes">
+          Alice Goldfuss defined container in her talk called The Container operator's manual as "__".
         When you’re making a dockerfile or some sort of a container config, which specifies the environment
 		and the file structure of your application. And when you build that Dockerfile, you are making a tarball,
 		which then gets deployed, unpacked and is then run as a process, like any other process on the host.
@@ -319,240 +320,12 @@
       </section>
 
       <section>
-        <h2> <em style="font-size: 140%">Syscalls!</em></h2>
-        <h4><span class="fragment">Around 330 system calls in Linux:</h4>
-        <ul>
-          <li class="fragment">File Access - <font color="#800020">creat</font>, <font color="#800020">read</font>,
-            <font color="#800020">write</font>,
-            <font color="#800020">open</font>, <font color="#800020">close</font>, etc.</li>
-          <li class="fragment">Process Control - <font color="#800020">wait</font>, <font color="#800020">waitpid</font>
-            , <font color="#800020">kill</font>, <font color="#800020">fork</font>, etc.</li>
-          <li class="fragment">Network Access - <font color="#800020">socket</font>, <font color="#800020">getsockopt
-            </font>, <font color="#800020">listen</font>, etc.</li>
-        </ul>
-        <aside class="notes">
-          Linux has around 330 system calls, some of the system calls are very esoteric while some are very widespread.
-
-          Some of the common system calls that you might have heard for which are used for file access are creat - to
-          create a file, read, write, open, close.
-          I included creat, because when Ken Thompson was asked is there anything he regrets about Unix, he said he
-          wished syscall creat wasn't named as such. Also to note that creat is obsolete now because of open. 😁
-          For process control, some of the common system calls are wait/waitpid - when you want to wait for a process to
-          finish, kill - to kill a process, fork - to spawn a process.
-          For network access some of the common system calls are socket - to create a socket, getsockopt, listen - to
-          listen to the socket.
-        </aside>
-      </section>
-
-      <section>
-        <h2 style="font-size: 99%">What happens when a syscall occurs?</h2>
-        <figure><img class="fragment" src="./images/syscalls-actions1.png" alt="">
-        </figure>
-        <figure><img class="fragment" src="./images/syscalls-actions2.png" alt="">
-        </figure>
-        <aside class="notes">
-          It's a simple 10 step process. When you want to read a file from user space, you setup one register with
-          file descriptor, one with the buffer where you want things to be read, and nbytes which will store how many
-          bytes have been written. Once these registers have been setup the control shifts to the library procedure.
-          The library procedure initiates syscalls with a software interrupt assembly language instruction.
-
-          Each syscall has an integer associated with it. For example read is 0, open is 2.
-          The argument to the interrupt is a number, which corresponds to the index of an array in the OS kernel
-          with pointers to the functions that provide the requested service.
-
-        </aside>
-      </section>
-
-      <section>
-        <h2 style="font-size: 99%">What happens when a syscall occurs?</h2>
-        <figure><img class="fragment" src="./images/syscalls-actions3.png" alt="">
-        </figure>
-        <figure><img class="fragment" src="./images/syscalls-actions4.png" alt="">
-        </figure>
-        <figure><img class="fragment" src="./images/syscalls-actions5.png" alt="">
-        </figure>
-        <aside class="notes">
-          The kernel lookups the register with the file descriptor, puts the result back in the buffer register and the
-          number of bytes read in another register and the control switches back to the user space.
-
-          One thing to also note is that system calls are expensive! There are two context switches involved, one when
-          the control switches to the kernel and the second when the control switches back to the user space.
-        </aside>
-      </section>
-
-      <section>
-        <h2 style="font-size: 204%">Making a syscall.</h2>
-        <figure><img src="./images/syscall-registers.png" alt="">
-        </figure>
-        <ul>
-          <li class="fragment">Setup register with syscall number & parameters.</li>
-          <li class="fragment">Send a trap to kernel.</li>
-          <li class="fragment">Result stored in register.</li>
-        </ul>
-        <aside class="notes">
-          The good thing is we don't have to actually setup these registers, there's a library which does that for us!
-          libc is the “C Standard Library” and has lots of historic connections with UNIX operating systems. The C
-          language was developed to write UNIX. Even today, interacting with a UNIX derivative involves using the tools
-          provided by the C language.
-          There are two mental hurdles required for Rust programmers to understanding this code:
-          1. the arcane types provided by libc
-          2. the unfamiliarity of providing arguments as pointers
-        </aside>
-      </section>
-
-      <section>
-        <h2> <span style="display: block; font-size: 140%">What is</span> <em style="font-size: 140%">strace?
-          </em>
-        </h2>
-        <ul>
-          <li class="fragment">A diagnostic, debugging and instructional userspace utility for Linux.</li>
-          <li class="fragment">Invaluable for solving problems with programs for which the source is not readily
-            available.</li>
-        </ul>
-        <aside class="notes">
-          strace is a linux utility which is incredibly useful for debugging closed source programs, or even finding out
-          performance bottlenecks! We know that syscalls are expensive, so when you find out that your program is doing
-          more open operations than you think it was, you can optimise that. Or when you have a closed source program
-          that was supposed to open the file x, but it opened the file y instead, strace allows you to do that! It's a
-          super power! 😅
-        </aside>
-      </section>
-
-      <section>
-        <h2> <span style="display: block; font-size: 140%">What is</span> <em style="font-size: 140%">strace?
-          </em>
-        </h2>
-        <pre><code>
-        fn main() {
-          println!("Hello RustConf!");
-        }
-        </code></pre>
-        <aside class="notes">
-        </aside>
-      </section>
-
-      <section>
-        <h2> What is <em style="font-size: 100%">strace?
-          </em>
-        </h2>
-        <figure><img src="./images/strace.png" alt="">
-        </figure>
-      </section>
-
-      <section>
-        <figure><img src="./images/stracec.png" alt="">
-        </figure>
-      </section>
-
-      <section>
-        <h2 style="font-size: 204%">Writing our own strace.</h2>
-        <ul>
-          <li class="fragment">How to observe another process?</li>
-          <li class="fragment">How to trap a system call?</li>
-          <li class="fragment">How to fetch register values?</li>
-        </ul>
-        <aside class="notes">
-          So if we want to write our own strace, how do we go about it? First, we need to know how to observe another
-          process. If we think of it like a debugger, we'd want to attach our strace to a process.
-
-          Once we know how to "observe" or attach to a process, we have to figure out all the system calls that this
-          process we are attached to is making!
-
-          Once we figure out when the syscalls are being made, we'd have to figure out how to fetch the register values
-          to figure out what syscall is being made.
-        </aside>
-      </section>
-
-      <section>
-        <h2>How to observe a process?</h2>
-        <h4><em class="fragment">
-            <font color="#800020">ptrace!!</font>
-          </em></h4>
-        <em class="fragment">
-          <figure><img src="./images/ptrace.png" alt=""></figure>
-        </em>
-        <aside class="notes">
-          The ptrace mechanism makes it possible for strace to interrupt the traced process every time a system call is
-          invoked, capture the call, decode it, and then resume the execution of the traced process.
-
-          The challenge is that every time a system call is invoked (eg. open, read, write, close), a context switch
-          from user level to kernel level is required. This process tends to be usually complex and relatively slow.
-        </aside>
-      </section>
-
-      <section>
-        <h2>How to observe a process?</h2>
-        <pre><code>
-        let output = cmd.before_exec(ptrace::traceme());
-          
-        let mut child = cmd.spawn();
-        </code></pre>
-        <aside class="notes">
-          ptrace allows to the tracer to observe and even control the execution of the tracee. ptrace is pretty shady
-          but also very powerful! It's also a security risk, so if we want to trace a process, one we need to be in the
-          parent namespace of the process and second the tracee needs to give explicit permission to allowing itself to
-          be traced.
-        </aside>
-      </section>
-
-
-      <section>
-        <h2>How to trap a system call?</h2>
-        <em class="fragment">
-          <figure><img src="./images/sigtrap.png" alt=""></figure>
-        </em>
-        <aside class="notes">
-          Everytime a syscall occurs in the traced process, a sigtrap is sent to ptrace and if you have a wait on the
-          process, the execution will stop and you can examine or even modify the registers!
-        </aside>
-      </section>
-
-      <section>
-        <h2>How to trap a system call?</h2>
-        <pre><code>
-        ptrace(
-          Request::PTRACE_SYSCALL,
-          pid,
-          ptr::null_mut(),
-          ptr::null_mut(),
-        );
-
-        waitpid(pid, None);
-        </code></pre>
-        <aside class="notes">
-          Ptrace comes to rescue again! It has a flag called PTRACE_SYSCALL which will arrange for the tracee to be
-          stopped at the next entry to or exit from a system call, or after execution of a single instruction,
-          respectively. From the tracer's perspective, the tracee will appear to have been stopped by receipt of a SIG‐
-          TRAP. So, for PTRACE_SYSCALL, for example, the idea is to inspect the arguments to the system call at the
-          first stop, then do another PTRACE_SYSCALL and inspect the return value of the system call at the second stop.
-        </aside>
-      </section>
-
-      <section>
-        <h2>How to fetch register values?</h2>
-        <pre><code>
-        let res = ptrace::ptrace(
-          Request::PTRACE_GETREGS,
-          pid,
-          PT_NULL as *mut c_void,
-          &mut regs as *mut _ as *mut c_void,
-        );
-        </code></pre>
-        <aside class="notes">
-          So this call will fetch all the registers for us! We need to know which register stores the number of the
-          syscall. I found this out from googling, that this is stored in the orig_rax register!
-        </aside>
-      </section>
-
-      <section>
-        <h2><strong class="hugify">DEMO!</strong></h2>
-        <aside class="notes">
-        </aside>
-      </section>
-
-      <section>
         <h2><strong class="hugify alright-calm-down-a-little" style="font-size: 104%">Conclusion 😊</strong></h2>
         <aside class="notes">
+          Containers aren’t magic. Anyone with a Linux machine can play around with them and tools like Docker and rkt are
+          just wrappers around things built into every modern kernel. No, you probably shouldn’t go and implement your
+          own container runtime. But having a better understanding of these lower level technologies will help you work
+          with these higher level tools (especially when debugging).
           In conclusion, Rust is so much more empowering than C, or C++ for systems programming because it follows the
           adage if it compiles, it works. In systems programming, sometimes you must perform operations that
           cannot be statically verified as safe. Rust gives you the tools to wrap these operations in safe
@@ -569,27 +342,6 @@
         </aside>
       </section>
 
-      <section class="u--align-left resourcetext">
-        <h2><em style="font-size: 140%">A Shoutout!</em></h2>
-        <ol>
-          <li>Arshia Mufti</li>
-          <li>Shalom Abete</li>
-          <li>Hailey James-Sorenson</li>
-          <li>Taylor James-Sorenson</li>
-          <li>Carrie Wu</li>
-          <li>Andrew Zuckerman</li>
-          <li>Theo Constantinedes</li>
-          <li>Charilaos Pipis</li>
-          <li>Wassim Marrakchi</li>
-          <li>Stephen Koo</li>
-        </ol>
-
-        <aside class="notes">
-          I want to thank all these folks for their invaluable feedback! =)
-        </aside>
-
-      </section>
-
       <section>
         <h2><em style="font-size: 140%">Thank you!</em></h2>
       </section>
@@ -597,17 +349,17 @@
       <section class="u--align-left resourcetext">
         <h4>Resources</h4>
         <ol>
-          <li><a href="https://www.youtube.com/watch?v=01w7viEZzXQ">A Go Programmer's Guide to Syscalls</a></li>
+          <li><a href="https://www.youtube.com/watch?v=sJx_emIiABk">The Container Operator's Manual - Alice Goldfuss</a></li>
           <li><a href="https://bit.ly/2Z7iJQP">Rust implementation of glibc</a></li>
           <li><a href="https://bit.ly/2ZaxPoy">System call table for Linux
               x86</a></li>
           <li><a href="http://willcrichton.net/notes/systems-programming/">What is systems programming really?</a></li>
           <li><a href="https://www.tcl.tk/doc/scripting.html">Scripting: Higher Level Programming
               for the 21st Century</a></li>
-          <li><a href="https://bit.ly/1MvkwUS">
-              Rust + nix = easier unix systems programming </a> </li>
           <li><a href="https://bit.ly/2P0e3by">
               Slide theme from @jlengstorf </a></li>
+          <li><a href="https://www.youtube.com/watch?v=8fi7uSYlOdc">Containers from scratch - Liz Rice</a></li>
+          <li><a href="https://jvns.ca/blog/2016/10/10/what-even-is-a-container/">What even is a Container?</a></li>
         </ol>
       </section>
     </div>
