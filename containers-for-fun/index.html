@@ -45,7 +45,15 @@
         <aside class="notes">
           You can follow along with the slides at the link: tiny.cc/rustrace
         </aside>
+      </section>
 
+      <section>
+        <h2>About me!</h2>
+        <ul>
+          <li class="fragment"><em>Tarides</em> - Software Engineer</li>
+          <li class="fragment"><em>Recurse Center</em> - Spring 1, 2019</li>
+          <li class="fragment"><em>BangBangCon West</em> - Co-Organiser</li>
+        </ul>
       </section>
 
       <section>
@@ -62,8 +70,7 @@
           I will focus on these themes:
           1. What does it mean to be a systems programming language?
           2. What makes Rust a good candidate for systems programming language?
-          3. Learn about system calls, and getting started with writing your first
-          systems program in Rust!
+          3. Learn about containers and writing your own container in Rust!
 
         </aside>
       </section>
@@ -151,7 +158,7 @@
 
           What is systems programming? You may visualize a computer as some sort of beast that obeys all commands. It
           has been said that computers are basically people made out of metal or, conversely, people are computers made
-          out of flesh and blood. However, once we get close to computers, we see that they are basically machines that
+          out of flesh and blood. However, once we get close to computers, we see that they are basically mSoftware Engineer - achines that
           follow very specific and primitive instructions. In the early days of computers, people communicated with them
           by on and off switches denoting primitive instructions. Soon people wanted to give more complex instructions.
           For example, they wanted to be able to say X = 30 * Y; given that Y = 10, what is X? Present day computers
@@ -288,9 +295,12 @@
           But you can throw everything I talked about last few minutes out of the window and systems-programming is
           when you spend more time looking at man pages than you do the internet.
         </aside>
-
       </section>
 
+      <section>
+         <h2> <span style="display: block; font-size: 140%">Writing our own </span> <em style="font-size: 140%">container!</em>
+        
+      </section>
 
       <section>
         <h2> <span style="display: block; font-size: 140%">What even is a </span> <em style="font-size: 140%">container?
@@ -302,7 +312,26 @@
 		  mean anything super precise. Basically there are a few new Linux kernel features (“namespaces” and
 		  “cgroups”) that let you isolate processes from each other. When you use those features, you call it “containers”.
 		  Basically these features let you pretend you have something like a virtual machine, except it’s not a virtual
-		  machine at all, it’s just processes running in the same Linux kernel.
+      machine at all, it’s just processes running in the same Linux kernel.
+      
+      You might have said one or more of:
+
+    A way to share resources
+    Process Isolation
+    Kind of like lightweight virtualisation
+    Packaging a root filesystem and metadata together
+    Kind of like a chroot jail
+    Something something shipping container something
+    Whatever docker does
+
+That is quite a lot of things for one word to mean! The word “container” has started to be used for a lot of (sometimes overlapping) concepts. It is used for the analogy of containerisation, and for the technologies used to implement it. If we consider these separately, we get a clearer picture. So, let’s talk about the why of containers, and then the how. (Then we’ll come back to why, again).
+
+      In the beginning, there was a program. Let's call the program run.sh, and what we’d do is we’d copy it to a remote server, and we would run it. However, running arbitrary code on remote computers is insecure and hard to manage and scale. So we invented virtual private servers and user permissions. And things were good.
+
+But little run.sh had dependencies. It needed certain libraries to exist on the host. And it never worked quite the same remotely and locally. (Stop me if you’ve heard this tune). So we invented AMIs (Amazon Machine Images) and VMDKs (VMware images) and Vagrantfiles and so on, and things were good.
+
+Well, they were kind-of good. The bundles were big and it was hard to ship them around effectively because they weren’t very standardised. And so, we invented caching.
+
         </aside>
       </section>
 
@@ -320,8 +349,23 @@
       </section>
 
       <section>
+          <h2><em>Deconstructing the container:</em></h2>
+          <ul>
+            <li class="fragment">chroot</li>
+            <li class="fragment">namespaces</li>
+            <li class="fragment">cgroups</li>
+          </ul>
+          <aside class="notes">
+            It would be nice if creating a container was as simple as just a create_container system call. It’s not. But honestly, it’s close.
+
+To talk about containers at the low level, we have to talk about three things. These things are namespaces, cgroups and chroot. There are other things, but these three make up the majority of the magic.
+
+          </aside>
+      </section>
+
+      <section>
           <h2><em style="font-size: 137%">chroot</em></h2>
-          <h3 style="margin-bottom: 0; font-size: 180%"><span>Change the root directory for the current process and its children for isolation.</span></h3>
+          <ul><lii class="fragment">Change the root directory for the current process and its children for isolation.</li></ul>
           <aside class="notes">
             Example of chroot jails where the application can't break out of /some-jail/ so one knows it won't access anything else on the machine.
             The first tool we’ll be working with is chroot. A thin wrapper around the similarly named syscall, it allows us to restrict a process’ view of
@@ -330,13 +374,45 @@
       </section>
 
       <section>
+        <h2>HOW TO CHROOT?</h2>
+        <pre><code>
+          chroot("bind_new_root");
+          env::set_current_dir("/").expect("chrdir failed");
+        </code>
+        </pre>
+      </section>
+
+      <section>
           <h2><em style="font-size: 137%">namespaces</em></h2>
-          <h3 style="margin-bottom: 0; font-size: 180%">
           <ul>
-          <li><span class="fragment">Namespaces determine what a process can see.</span></li>
-          <li><span class="fragment">Multiple namespaces: pid, net, uts, ipc, user, mnt</span></li>
+          <li class="fragment">Namespaces determine what a process can see.</li>
+          <li class="fragment">Multiple namespaces: pid, net, uts, ipc, user, mnt</li>
         </ul>
-        </h3>
+          <aside class="notes">
+            Linux namespaces were inspired by the wider namespace functionality used heavily throughout Plan 9 from Bell Labs.[1]
+           Just as chroot allows processes to see any arbitrary directory as the root of the system (independent of the rest of the
+           processes), Linux namespaces allow other aspects of the operating system to be independently modified as well. This
+           includes the process tree, networking interfaces, mount points, inter-process communication resources and more.
+      in a pid namespace you become PID 1 and then your children are other processes. All the other programs are gone
+       in a networking namespace you can run programs on any port you want without it conflicting with what’s already running   
+      in a mount namespace you can mount and unmount filesystems without it affecting the host filesystem. So you can have a totally different set of devices mounted.
+      </aside>
+      </section>
+
+     <section>
+          <h2><em style="font-size: 137%">namespaces</em></h2>
+          <ul>
+          <li class="fragment">Creating namespaces:</li>
+                  <ul>
+                      <li class="fragment">clone() syscall</li>
+                  </ul>
+          <li class="fragment">A namespace is destroyed once the last process in a namespace leaves.</li>
+          <li class="fragment">Enter a namespace:
+               <ul>
+                      <li>setns() syscall</li>
+                  </ul>
+</li>
+        </ul>
           <aside class="notes">
             Linux namespaces were inspired by the wider namespace functionality used heavily throughout Plan 9 from Bell Labs.[1]
            Just as chroot allows processes to see any arbitrary directory as the root of the system (independent of the rest of the
@@ -346,51 +422,28 @@
       </section>
 
       <section>
-          <h2><em style="font-size: 137%">namespaces</em></h2>
-          <ul>
-          <li><span class="fragment">in a pid namespace you become PID 1 and then your children are other processes. All the other programs are gone.</span></li>
-          <li><span class="fragment">in a networking namespace you can run programs on any port you want without it conflicting with what’s already running.</span></li>
-          <li><span class="fragment">in a mount namespace you can mount and unmount filesystems without it affecting the host filesystem. So you can have a totally different set of devices mounted.
-</span></li>
-        </ul>
-          <aside class="notes">
-            Linux namespaces were inspired by the wider namespace functionality used heavily throughout Plan 9 from Bell Labs.[1]
-           Just as chroot allows processes to see any arbitrary directory as the root of the system (independent of the rest of the
-           processes), Linux namespaces allow other aspects of the operating system to be independently modified as well. This
-           includes the process tree, networking interfaces, mount points, inter-process communication resources and more.
-          </aside>
-      </section>
-    
-     <section>
-          <h2><em style="font-size: 137%">namespaces</em></h2>
-          <ul>
-          <li><span class="fragment">Creating namespaces:</span></li>
-                  <ul>
-                      <li><span class="fragment">clone() syscall</span></li>
-                  </ul>
-          <li><span class="fragment">A namespace is destroyed once the last process in a namespace leaves.</span></li>
-          <li><span class="fragment">Enter a namespace:
-               <ul>
-                      <li>setns() syscall</li>
-                  </ul>
-</span></li>
-        </ul>
-          <aside class="notes">
-            Linux namespaces were inspired by the wider namespace functionality used heavily throughout Plan 9 from Bell Labs.[1]
-           Just as chroot allows processes to see any arbitrary directory as the root of the system (independent of the rest of the
-           processes), Linux namespaces allow other aspects of the operating system to be independently modified as well. This
-           includes the process tree, networking interfaces, mount points, inter-process communication resources and more.
-          </aside>
+        <h2>How to create a namespace?</h2>
+        <pre><code>
+  nix::sched::unshare(CloneFlags::CLONE_NEWUTS | 
+                      CloneFlags::CLONE_NEWPID |
+                      CloneFlags::CLONE_NEWNS)
+                      .expect("Unshare failed.");
+        </code></pre>
+        <aside class="notes">
+          Unshares the indicated namespaces from the parent process and then
+       executes the specified program. If program is not given, then
+       ``${SHELL}'' is run (default: /bin/sh).
+        </aside>
       </section>
 
       <section>
           <h2><em style="font-size: 137%">cgroups</em></h2>
           <ul>
-          <li><span class="fragment">Allow processes to be organized into hierarchical groups.</span></li>
+          <li class="fragment">Allow processes to be organized into hierarchical groups.</li>
                   <ul>
-                      <li><span class="fragment">The resources and usage of these groups can be limited.</span></li>
+                      <li class="fragment">The resources and usage of these groups can be limited.</li>
                   </ul>
-          <li><span class="fragment">Implemented through a pseudo filesystem called cgroupfs.</span></li>
+          <li class="fragment">Implemented through a pseudo filesystem called cgroupfs.</li>
         </ul>
           <aside class="notes">
               Okay, so we’ve made a new magical world with new processes and sockets that is separate from our old world. Cool! What if I want to limit how much memory or CPU one of my programs is using? 
@@ -399,16 +452,26 @@
 
 
     <section>
-          <h2><em style="font-size: 137%">namespaces</em></h2>
+          <h2><em style="font-size: 137%">cgroups</em></h2>
           <ul>
-          <li><span class="fragment">Subgroups inherit the limits set on the parent group.</span></li>
-          <li><span class="fragment">A process can be a part of only one cgroup.</span></li>
-          <li><span class="fragment">A subsystem controls each resource, e.g. the memory subsystem controls the memory use.
-          </span></li>
+          <li class="fragment">Subgroups inherit the limits set on the parent group.</li>
+          <li class="fragment">A process can be a part of only one cgroup.</li>
+          <li class="fragment">A subsystem controls each resource, e.g. the memory subsystem controls the memory use.
+          </li>
         </ul>
           <aside class="notes">
             If the process exceeds the memory limit, it can be OOM killed or will keep emitting OOM notifications.
           </aside>
+      </section>
+
+      <section>
+        <h2><em>CGROUPS</em></h2>
+        <pre><code>
+          let mut cgroups = PathBuf::from("/sys/fs/cgroup/");
+
+          let pid_max = cgroups.join();
+          fs::write(pid_max, "20".as_bytes());
+        </code></pre>
       </section>
 
       <section>
